@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D2929D5C-E6A3-4974-B751-B5E5772701D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shape.Contracts", "src\Shape.Contracts\Shape.Contracts.csproj", "{9A7DA8B5-C58E-4D04-B23A-C669EAD47820}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{014BA022-1472-4A3B-9387-28A2DBE28521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shape.Tests", "tests\Shape.Tests\Shape.Tests.csproj", "{19CE495B-4136-42E9-8662-E44A0C8A3580}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A7DA8B5-C58E-4D04-B23A-C669EAD47820}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A7DA8B5-C58E-4D04-B23A-C669EAD47820}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A7DA8B5-C58E-4D04-B23A-C669EAD47820}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A7DA8B5-C58E-4D04-B23A-C669EAD47820}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19CE495B-4136-42E9-8662-E44A0C8A3580}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19CE495B-4136-42E9-8662-E44A0C8A3580}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19CE495B-4136-42E9-8662-E44A0C8A3580}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19CE495B-4136-42E9-8662-E44A0C8A3580}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9A7DA8B5-C58E-4D04-B23A-C669EAD47820} = {D2929D5C-E6A3-4974-B751-B5E5772701D7}
+		{19CE495B-4136-42E9-8662-E44A0C8A3580} = {014BA022-1472-4A3B-9387-28A2DBE28521}
+	EndGlobalSection
+EndGlobal

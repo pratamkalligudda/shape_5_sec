@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+node_modules/
+web/dist/
+.azurite/
+__azurite_db_*
+__blobstorage__/
+__queuestorage__/
+.superpowers/
