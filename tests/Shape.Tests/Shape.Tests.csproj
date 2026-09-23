@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\src\Shape.Contracts\Shape.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Shape.GatewaySimulator\Shape.GatewaySimulator.csproj" />
     <ProjectReference Include="..\..\src\Shape.Ingest\Shape.Ingest.csproj" />
+    <ProjectReference Include="..\..\src\Shape.Functions\Shape.Functions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
