@@ -14,6 +14,7 @@ export class ReplayQueue {
   private seen = new Set<string>()
   private retired = new Set<string>()
   private current: string | null = null
+  private currentStart = Number.NEGATIVE_INFINITY // ts of the first sample seen for the current session
   private currentPartial = false
   private _points: Point[] = []
   private _sessionStarts: number[] = []
@@ -39,8 +40,17 @@ export class ReplayQueue {
 
     const newSession = batch.sessionId !== this.current
     if (newSession) {
+      // A session we have never seen may still be older than the current one (e.g. a late flush from before a
+      // page reload). Order sessions by sample time, not arrival: data that ends before the current session began
+      // belongs to a superseded session.
+      const batchEnd = Date.parse(batch.samples[batch.samples.length - 1].ts)
+      if (this.current && batchEnd < this.currentStart) {
+        this.retired.add(batch.sessionId)
+        return
+      }
       if (this.current) this.retired.add(this.current)
       this.current = batch.sessionId
+      this.currentStart = Date.parse(batch.samples[0].ts)
     }
     this.currentPartial = batch.partial
 

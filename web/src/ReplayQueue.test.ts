@@ -109,6 +109,22 @@ describe('ReplayQueue', () => {
     expect(q.sessionId).toBe('b')
   })
 
+  it('ignores an older unseen session arriving after the current one', () => {
+    const q = new ReplayQueue()
+    q.push(batch(0, { n: 1, session: 'b', startSec: 100 }))
+    q.push(batch(3, { n: 1, session: 'a', startSec: 15 })) // late flush from a session this page never saw
+    q.push(batch(1, { n: 1, session: 'b', startSec: 101 }))
+    expect(q.sessionId).toBe('b')
+    expect(q.queueDepth).toBe(2)
+  })
+
+  it('still switches to a genuinely newer unseen session', () => {
+    const q = new ReplayQueue()
+    q.push(batch(4, { n: 1, session: 'a', startSec: 20 }))
+    q.push(batch(0, { n: 1, session: 'b', startSec: 100 }))
+    expect(q.sessionId).toBe('b')
+  })
+
   it('plays partial batches sample by sample', () => {
     const q = new ReplayQueue()
     q.push(batch(0, { n: 2 }))

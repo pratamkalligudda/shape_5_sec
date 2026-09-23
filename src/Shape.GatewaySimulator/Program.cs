@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using Shape.Contracts;
 using Shape.GatewaySimulator;
 
@@ -8,7 +9,7 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions { ContentRo
 builder.WebHost.UseUrls(options.Urls);
 builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
     p.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod()));
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient(Options.DefaultName, c => c.Timeout = TimeSpan.FromSeconds(30));
 builder.Services.AddSingleton(options);
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<SessionController>();

@@ -19,7 +19,9 @@ function Wait-Url([string]$Url, [string]$Method = 'Get', [int]$TimeoutSec = 90) 
 }
 
 function Invoke-Scenario([string[]]$SimArgs, [string[]]$ClientArgs) {
-    $sim = Start-Process dotnet -ArgumentList (@($simDll, '--seed', '42') + $SimArgs) -PassThru -WindowStyle Hidden
+    $simLog = [IO.Path]::GetTempFileName()
+    $sim = Start-Process dotnet -ArgumentList (@($simDll, '--seed', '42') + $SimArgs) -PassThru -WindowStyle Hidden `
+        -RedirectStandardOutput $simLog
     try {
         Wait-Url 'http://localhost:5100/fast-polling/status'
         dotnet $client @ClientArgs
@@ -28,6 +30,9 @@ function Invoke-Scenario([string[]]$SimArgs, [string[]]$ClientArgs) {
     finally {
         Stop-Process -Id $sim.Id -ErrorAction SilentlyContinue
     }
+    # Every delivery must succeed first time, including stale batches the Function answers with no SignalR message.
+    $failures = Select-String -Path $simLog -Pattern 'got HTTP|failed:|timed out|Dropping batch'
+    if ($failures) { throw "Simulator reported delivery failures for '$SimArgs':`n$($failures.Line -join "`n")" }
 }
 
 Wait-Url 'http://localhost:7071/api/negotiate' -Method Post
@@ -37,5 +42,8 @@ Invoke-Scenario @() @('--count', '3')
 
 Write-Host '== Scenario 2: dropped batches =='
 Invoke-Scenario @('--drop-every', '2') @('--count', '3', '--expect-gap')
+
+Write-Host '== Scenario 3: reordered batches (stale deliveries return no push) =='
+Invoke-Scenario @('--reorder') @('--count', '3', '--expect-gap')
 
 Write-Host 'ALL SMOKE SCENARIOS PASSED'

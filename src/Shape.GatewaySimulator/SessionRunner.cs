@@ -29,7 +29,17 @@ public sealed class SessionRunner(
         var consumer = Task.Run(async () =>
         {
             await foreach (var batch in outbox.Reader.ReadAllAsync())
-                await publisher.PublishAsync(batch, CancellationToken.None);
+            {
+                try
+                {
+                    await publisher.PublishAsync(batch, CancellationToken.None);
+                }
+                catch (Exception ex)
+                {
+                    // One bad delivery must never end the session's publishing.
+                    logger.LogError(ex, "Publishing batch {BatchSeq} threw; continuing", batch.Properties?.BatchSeq);
+                }
+            }
         });
 
         logger.LogInformation("Session {SessionId} started ({Minutes} min)", session.SessionId, session.DurationMinutes);

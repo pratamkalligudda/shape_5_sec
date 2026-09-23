@@ -2,7 +2,7 @@ using Shape.Contracts;
 
 namespace Shape.GatewaySimulator;
 
-/// <summary>Test-only faults: drop every Nth batch, and/or send adjacent batches swapped. One instance per session.</summary>
+/// <summary>Test-only faults: drop every Nth batch, and/or send adjacent batches after the baseline swapped. One instance per session.</summary>
 public sealed class FaultInjector(int dropEvery, bool reorder)
 {
     private long _count;
@@ -12,7 +12,8 @@ public sealed class FaultInjector(int dropEvery, bool reorder)
     {
         _count++;
         if (dropEvery >= 2 && _count % dropEvery == 0) return [];
-        if (!reorder) return [batch];
+        // Never hold the baseline (batch 0): it carries the Body the Function needs to start the session.
+        if (!reorder || batch.Properties?.BatchSeq == 0) return [batch];
         if (_held is null)
         {
             _held = batch;

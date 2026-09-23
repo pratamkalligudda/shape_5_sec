@@ -86,6 +86,16 @@ public class EventGridPublisherTests
     }
 
     [Fact]
+    public async Task Retries_on_http_timeout()
+    {
+        // HttpClient reports its own timeout as TaskCanceledException, not HttpRequestException.
+        var handler = new StubHandler(new TaskCanceledException("timeout"), HttpStatusCode.OK);
+
+        Assert.True(await Publisher(handler).PublishAsync(Batch(), CancellationToken.None));
+        Assert.Equal(2, handler.Requests.Count);
+    }
+
+    [Fact]
     public async Task Gives_up_after_all_retries_and_returns_false()
     {
         var handler = new StubHandler(HttpStatusCode.ServiceUnavailable);

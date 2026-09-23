@@ -50,6 +50,11 @@ public sealed class EventGridPublisher(
             {
                 logger.LogWarning("Batch {BatchSeq} attempt {Attempt} failed: {Error}", seq, attempt + 1, ex.Message);
             }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                // HttpClient.Timeout surfaces as TaskCanceledException; treat it as a failed attempt.
+                logger.LogWarning("Batch {BatchSeq} attempt {Attempt} timed out", seq, attempt + 1);
+            }
 
             if (attempt >= retryDelays.Count)
             {

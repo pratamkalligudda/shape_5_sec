@@ -32,15 +32,22 @@ public class FaultInjectorTests
     }
 
     [Fact]
-    public void Reorder_swaps_adjacent_pairs_and_drains_leftover()
+    public void Reorder_keeps_baseline_first_then_swaps_adjacent_pairs()
     {
-        Assert.Equal(new[] { 1L, 0, 3, 2, 4 }, Run(new FaultInjector(0, true), 5));
+        // Batch 0 carries the Body; swapping it away would turn the whole session into a partial orphan.
+        Assert.Equal(new[] { 0L, 2, 1, 4, 3 }, Run(new FaultInjector(0, true), 5));
+    }
+
+    [Fact]
+    public void Reorder_drains_leftover_at_session_end()
+    {
+        Assert.Equal(new[] { 0L, 2, 1, 3 }, Run(new FaultInjector(0, true), 4));
     }
 
     [Fact]
     public void Drop_applies_before_reorder()
     {
-        // dropped: 2,5 → survivors 0,1,3,4 → swapped pairs
-        Assert.Equal(new[] { 1L, 0, 4, 3 }, Run(new FaultInjector(3, true), 6));
+        // dropped: 2,5 → survivors 0,1,3,4 → 0 passes, then (1,3) swapped, 4 drained
+        Assert.Equal(new[] { 0L, 3, 1, 4 }, Run(new FaultInjector(3, true), 6));
     }
 }

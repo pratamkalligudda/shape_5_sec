@@ -22,6 +22,19 @@ public class SessionRunnerTests
         }
     }
 
+    private sealed class ThrowOncePublisher : IBatchPublisher
+    {
+        private int _calls;
+        public List<long> Delivered { get; } = new();
+
+        public Task<bool> PublishAsync(TelemetryBatch batch, CancellationToken ct)
+        {
+            if (Interlocked.Increment(ref _calls) == 1) throw new InvalidOperationException("boom");
+            lock (Delivered) Delivered.Add(batch.Properties!.BatchSeq);
+            return Task.FromResult(true);
+        }
+    }
+
     private static async Task Until(Func<bool> condition)
     {
         var deadline = DateTime.UtcNow.AddSeconds(5);
@@ -117,5 +130,25 @@ public class SessionRunnerTests
         await run;
 
         Assert.Equal(new[] { 0L, 2L }, publisher.Batches.Select(b => b.Properties!.BatchSeq));
+    }
+
+    [Fact]
+    public async Task Publisher_exception_does_not_stop_later_batches()
+    {
+        var time = new FakeTimeProvider(DateTimeOffset.Parse("2026-09-23T12:00:00Z"));
+        var controller = new SessionController(time);
+        var publisher = new ThrowOncePublisher();
+        var seed = Seed();
+        var runner = new SessionRunner(() => new PumpDevice(seed, randomSeed: 1), publisher, new SimulatorOptions(),
+            controller, time, NullLogger<SessionRunner>.Instance);
+        var session = controller.Enable(null).Session!;
+        var run = runner.RunAsync(session, CancellationToken.None);
+
+        await AdvanceSeconds(time, 14); // batches 0,1,2; batch 0 throws
+        await Until(() => { lock (publisher.Delivered) return publisher.Delivered.Count == 2; });
+        controller.Disable();
+        await run;
+
+        Assert.Equal(new[] { 1L, 2L }, publisher.Delivered);
     }
 }
