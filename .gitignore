@@ -9,3 +9,4 @@ __azurite_db_*
 __blobstorage__/
 __queuestorage__/
 .superpowers/
+data/
