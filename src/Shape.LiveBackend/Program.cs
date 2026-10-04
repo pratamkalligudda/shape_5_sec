@@ -1,6 +1,11 @@
+using Azure.Data.Tables;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Shape.LiveBackend.Api;
 using Shape.LiveBackend.Devices;
+using Shape.LiveBackend.Gateway;
 using Shape.LiveBackend.Infrastructure;
+using Shape.LiveBackend.LiveData;
 using Shape.LiveBackend.Options;
 using Shape.LiveBackend.Sessions;
 
@@ -11,11 +16,24 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<IDeviceDirectory>(_ => new ConfigDeviceDirectory(DeviceConfig.Load(DeviceConfig.DefaultPath)));
 builder.Services.AddSingleton<ILivePollingSessionRepository>(sp =>
     new SqliteLivePollingSessionRepository(RepoPaths.Resolve(sp.GetRequiredService<IOptions<LivePollingOptions>>().Value.SessionDbPath)));
+builder.Services.AddHttpClient<IDirectMethodClient, HttpDirectMethodClient>((sp, http) =>
+{
+    http.BaseAddress = new Uri(sp.GetRequiredService<IOptions<LivePollingOptions>>().Value.IoTHubUrl);
+    http.Timeout = Timeout.InfiniteTimeSpan;   // HttpDirectMethodClient applies responseTimeout + grace itself
+});
+builder.Services.AddSingleton(sp => new TableServiceClient(sp.GetRequiredService<IOptions<LivePollingOptions>>().Value.TableConnectionString));
+builder.Services.AddSingleton<ILiveSessionReader>(sp => new TableLiveSessionReader(sp.GetRequiredService<TableServiceClient>()));
+builder.Services.AddScoped<LiveSessionService>();
 builder.Services.AddHostedService<SessionSchemaInitializer>();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
     .WithOrigins(builder.Configuration["Cors:Origin"] ?? "http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 builder.Services.AddControllers()
-    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new UtcDateTimeOffsetConverter()));
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new UtcDateTimeOffsetConverter()))
+    .ConfigureApiBehaviorOptions(o => o.InvalidModelStateResponseFactory = context =>
+        new BadRequestObjectResult(ApiResponse.Fail(ErrorCodes.InvalidParameters, "Invalid live session parameters.",
+            context.ModelState
+                .Where(kv => kv.Value is { Errors.Count: > 0 })
+                .Select(kv => $"{kv.Key.TrimStart('$', '.')}: {kv.Value!.Errors[0].ErrorMessage}"))));
 
 var app = builder.Build();
 
