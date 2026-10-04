@@ -3,6 +3,7 @@ using Azure.Data.Tables;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Shape.LiveIngestion.Infrastructure;
 using Shape.LiveIngestion.LivePolling;
 
 var host = new HostBuilder()
@@ -24,6 +25,10 @@ var host = new HostBuilder()
         });
         services.AddSingleton<ILiveSessionStore>(sp => new TableLiveSessionStore(sp.GetRequiredService<TableServiceClient>()));
         services.AddSingleton<LiveTelemetryProcessor>();
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ICleanupSessionSource>(_ =>
+            new SqliteCleanupSessionSource(RepoPaths.Resolve(config["LivePolling:SessionDbPath"] ?? "data/live-polling.db")));
+        services.AddSingleton<LivePollingCleanup>();
     })
     .Build();
 
