@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Shape.LiveBackend.Api;
+using Shape.LiveBackend.Series;
 using Shape.LiveBackend.Sessions;
 
 namespace Shape.LiveBackend.Controllers;
@@ -25,6 +26,12 @@ public sealed class LivePollingController(LiveSessionService service) : Controll
     [HttpDelete]
     public async Task<IActionResult> Stop(string serialNumber, CancellationToken ct) =>
         From(await service.StopAsync(serialNumber, ct));
+
+    /// <summary>Repeat ?metric= for several; a comma-separated value is one (invalid) name, as in the reference contract.</summary>
+    [HttpGet("series")]
+    public async Task<IActionResult> Series(string serialNumber, [FromQuery(Name = "metric")] string?[]? metric,
+        [FromQuery] DateTimeOffset? since, [FromServices] LiveSeriesService series, CancellationToken ct) =>
+        From(await series.GetSeriesAsync(serialNumber, metric, since, ct));
 
     private static ObjectResult From(ServiceResult r) => new(r.Body) { StatusCode = r.StatusCode };
 }

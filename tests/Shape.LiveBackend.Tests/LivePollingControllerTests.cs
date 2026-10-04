@@ -126,4 +126,34 @@ public sealed class LivePollingControllerTests : IDisposable
         Assert.Equal(HttpStatusCode.Conflict, r.StatusCode);
         Assert.Equal("LIVE_SESSION_NOT_ACTIVE", (await Body(r)).GetProperty("errors")[0].GetString());
     }
+
+    [Fact]
+    public async Task Comma_separated_metrics_are_one_invalid_name()
+    {
+        var r = await _factory.CreateClient().GetAsync(Base + "/series?metric=OperatingPressurePSI,StrokeRateLeft");
+
+        Assert.Equal(HttpStatusCode.BadRequest, r.StatusCode);
+        var errors = (await Body(r)).GetProperty("errors");
+        Assert.Equal("LIVE_SESSION_INVALID_PARAMETERS", errors[0].GetString());
+        Assert.Equal("'OperatingPressurePSI,StrokeRateLeft' is not a known metric.", errors[1].GetString());
+        Assert.StartsWith("Valid metrics: ", errors[errors.GetArrayLength() - 1].GetString());
+    }
+
+    [Fact]
+    public async Task Repeated_metric_parameters_bind_and_reach_the_session_check()
+    {
+        var r = await _factory.CreateClient().GetAsync(Base + "/series?metric=OperatingPressurePSI&metric=strokerateleft");
+
+        Assert.Equal(HttpStatusCode.Conflict, r.StatusCode);
+        Assert.Equal("LIVE_SESSION_NOT_ACTIVE", (await Body(r)).GetProperty("errors")[0].GetString());
+    }
+
+    [Fact]
+    public async Task Unparseable_since_is_invalid_parameters()
+    {
+        var r = await _factory.CreateClient().GetAsync(Base + "/series?since=yesterday");
+
+        Assert.Equal(HttpStatusCode.BadRequest, r.StatusCode);
+        Assert.Equal("LIVE_SESSION_INVALID_PARAMETERS", (await Body(r)).GetProperty("errors")[0].GetString());
+    }
 }

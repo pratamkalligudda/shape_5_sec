@@ -7,6 +7,7 @@ using Shape.LiveBackend.Gateway;
 using Shape.LiveBackend.Infrastructure;
 using Shape.LiveBackend.LiveData;
 using Shape.LiveBackend.Options;
+using Shape.LiveBackend.Series;
 using Shape.LiveBackend.Sessions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +25,8 @@ builder.Services.AddHttpClient<IDirectMethodClient, HttpDirectMethodClient>((sp,
 builder.Services.AddSingleton(sp => new TableServiceClient(sp.GetRequiredService<IOptions<LivePollingOptions>>().Value.TableConnectionString));
 builder.Services.AddSingleton<ILiveSessionReader>(sp => new TableLiveSessionReader(sp.GetRequiredService<TableServiceClient>()));
 builder.Services.AddScoped<LiveSessionService>();
+builder.Services.AddSingleton(_ => MetricRegistry.Load(MetricRegistry.DefaultSeedPath));
+builder.Services.AddScoped<LiveSeriesService>();
 builder.Services.AddHostedService<SessionSchemaInitializer>();
 builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
     .WithOrigins(builder.Configuration["Cors:Origin"] ?? "http://localhost:5173").AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
