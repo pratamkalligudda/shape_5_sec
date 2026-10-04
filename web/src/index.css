@@ -1,0 +1,64 @@
+:root {
+  --bg: #f4f6f8;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7785;
+  --border: #dde3ea;
+  --primary: #1565c0;
+  --danger: #c62828;
+  --ok: #2e7d32;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+h1 { font-size: 1.25rem; margin: 0; }
+h2 { font-size: 1rem; margin: 0 0 8px; }
+button { font: inherit; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); cursor: pointer; }
+button:disabled { opacity: 0.5; cursor: default; }
+button.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+button.danger { color: var(--danger); border-color: var(--danger); }
+button.link { border: none; background: none; text-decoration: underline; margin-left: 12px; }
+input { font: inherit; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; width: 7em; }
+.page { max-width: 1440px; margin: 0 auto; padding: 16px; }
+.header { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+.controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.live-badge { color: var(--danger); font-weight: 600; }
+.conn { font-size: 0.8rem; color: var(--muted); }
+.conn-connected { color: var(--ok); }
+.muted { color: var(--muted); font-size: 0.85rem; }
+.error { color: var(--danger); }
+.banner { margin-top: 12px; padding: 10px 14px; border-radius: 8px; }
+.banner-error { background: #fdecea; border: 1px solid #f5c2c0; }
+.banner-info { background: #fff8e1; border: 1px solid #ffe082; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; margin-top: 16px; }
+@media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+.main-col, .side-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border-width: 2px; border-radius: 999px; padding: 3px 10px; opacity: 0.45; }
+.chip.on { opacity: 1; }
+.empty { padding: 40px 0; text-align: center; }
+.status-strip { display: flex; height: 10px; margin: 6px 0 0 60px; border-radius: 3px; overflow: hidden; }
+.status-strip > div { flex: 1; min-width: 1px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.8rem; margin-top: 8px; }
+.tooltip { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; }
+.tooltip-event { font-weight: 600; margin-top: 4px; }
+.hours { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hours-card .big { font-size: 1.4rem; font-weight: 600; margin-top: 4px; }
+.metrics { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 12px; }
+.field-list { list-style: none; margin: 0; padding: 0; max-height: 360px; overflow: auto; border: 1px solid var(--border); border-radius: 6px; }
+.field-list li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 8px; cursor: pointer; font-size: 0.85rem; }
+.field-list li:hover, .field-list li.selected { background: #e3f2fd; }
+.metric-table { max-height: 360px; overflow: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th, td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0; }
+.preset-grid button { font-size: 0.8rem; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0 0 8px; font-size: 0.85rem; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.violations { max-height: 160px; overflow: auto; font-size: 0.75rem; color: var(--danger); padding-left: 18px; }
+pre { max-height: 300px; overflow: auto; font-size: 0.75rem; background: #f7f9fb; padding: 8px; border-radius: 6px; }
