@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>SignalR sniffer — dev</title>
+    <style>
+      body { font: 13px system-ui, sans-serif; margin: 16px; background: #fafafa; color: #222; }
+      fieldset { border: 1px solid #ccc; padding: 8px 12px; margin-bottom: 12px; }
+      label { display: block; margin: 4px 0; }
+      input[type=text] { width: 100%; max-width: 760px; font: 12px ui-monospace, monospace; padding: 4px; }
+      button { margin-right: 6px; padding: 4px 10px; }
+      #state { font-weight: 600; margin-left: 8px; }
+      table { border-collapse: collapse; width: 100%; font: 12px ui-monospace, monospace; }
+      th, td { border-bottom: 1px solid #e3e3e3; padding: 3px 6px; text-align: left; vertical-align: top; }
+      th { background: #eee; position: sticky; top: 0; }
+      tr.live td { background: #eaf7ea; }
+      tr.end td { background: #fdecea; }
+      tr.sys td { color: #666; font-style: italic; }
+      details summary { cursor: pointer; color: #36c; }
+      pre { margin: 4px 0; white-space: pre-wrap; max-height: 240px; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <fieldset>
+      <legend>Real dev SignalR (via /neg proxy → shapeiotdfunc-socket-vlbtul)</legend>
+      <label>x-user-id <input id="user" type="text" /></label>
+      <label>Device GUIDs (comma-separated) <input id="devices" type="text" /></label>
+      <button id="connect">Connect</button>
+      <button id="rejoin" disabled>Re-join devices</button>
+      <button id="leave" disabled>Leave devices</button>
+      <button id="disconnect" disabled>Disconnect</button>
+      <button id="clear">Clear log</button>
+      <label style="display:inline"><input id="showTelemetry" type="checkbox" checked /> show telemetryUpdate</label>
+      <span id="state">disconnected</span>
+    </fieldset>
+    <table>
+      <thead><tr><th>Received</th><th>Message</th><th>Session</th><th>Device</th><th>Info</th></tr></thead>
+      <tbody id="log"></tbody>
+    </table>
+    <script type="module" src="/src/sniffer.ts"></script>
+  </body>
+</html>
